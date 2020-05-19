@@ -1,4 +1,6 @@
-FROM turbointegrations/base:0.1-rhel
+ARG flavor=alpine
+
+FROM turbointegrations/base:0.1-$flavor
 
 RUN pip install boto3 && \
     pip install msrest && \

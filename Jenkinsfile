@@ -4,9 +4,9 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'ls -alh'
-                sh 'docker build -f Dockerfile.alpine -t turbointegrations/orchestration:0.1-alpine .'
-                sh 'docker build -f Dockerfile.slim-buster -t turbointegrations/orchestration:0.1-slim-buster .'
-                sh 'docker build -f Dockerfile.rhel -t turbointegrations/orchestration:0.1-rhel .'
+                sh 'docker build --build-arg flavor=alpine -t turbointegrations/orchestration:0.1-alpine .'
+                sh 'docker build --build-arg flavor=slim-buster -t turbointegrations/orchestration:0.1-slim-buster .'
+                sh 'docker build --build-arg flavor=.rhel -t turbointegrations/orchestration:0.1-rhel .'
             }
         }
 
