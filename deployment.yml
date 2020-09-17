@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: actionscripts
+  labels:
+    environment: prod
+    team: turbointegrations
+    app: actionscripts
+    version: "0.1"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: actionscripts
+  template:
+    metadata:
+      labels:
+        environment: prod
+        team: turbointegrations
+        app: actionscripts
+        version: "0.1"
+    spec:
+      containers:
+      - name: actionscripts
+        image: turbointegrations/orchestration:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: TURBOPASS
+          valueFrom:
+            secretKeyRef:
+              name: actionscriptkeys
+              key: turbopass
+        - name: TURBOUSER
+          valueFrom:
+            secretKeyRef:
+              name: actionscriptkeys
+              key: turbouser
+        ports:
+        - name: sshd
+          containerPort: 22
+        volumeMounts:
+        - mountPath: /sshkeys
+          name: sshkeys
+      volumes:
+      - name: sshkeys
+        secret:
+          secretName: actionscriptkeys
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: actionscripts
+spec:
+  ports:
+  - name: sshd
+    port: 22
+    protocol: TCP
+  selector:
+    app: actionscripts
