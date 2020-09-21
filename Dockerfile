@@ -26,6 +26,8 @@ RUN apk update && \
     pip install azure-mgmt-storage && \
     pip install pyvmomi && \
     chmod +x /entrypoint.sh && \
+    mkfifo /var/log/stdout && \
+    chmod 0666 /var/log/stdout && \
     rm -rf /var/cache/apk/*
 
 ENTRYPOINT ["/entrypoint.sh"]

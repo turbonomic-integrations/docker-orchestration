@@ -93,13 +93,12 @@ fi
 
 # Move host and authorized keys to location & set perms
 cp /sshkeys/hostkey* /etc/ssh/keys/
-chown root:root /etc/ssh/keys/hostkey
-chmod 0600 /etc/ssh/keys/hostkey
+chown -R root:root /etc/ssh/keys
+chmod -R 0600 /etc/ssh/keys
 
 cp /sshkeys/turboauthorizedkey.pub /etc/authorized_keys/turbo
-chown root:root /etc/authorized_keys
-chmod 755 /etc/authorized_keys
-chown turbo:turbo /etc/authorized_keys/turbo
+chown -R turbo:turbo /etc/authorized_keys
+chmod -R 755 /etc/authorized_keys
 # test for writability before attempting chmod
 for f in $(find /etc/authorized_keys/ -type f -maxdepth 1); do
     [ -w "${f}" ] && chmod 644 "${f}"
@@ -123,8 +122,9 @@ if [ ! -e "/actionscripts/manifest.json" ]; then
 EOF
 
   cat <<EOF > /actionscripts/replace_resize_vm.sh
-echo "Replace actionscript executed with the following environment.\n" >> /proc/1/fd/1
-env | grep VMT >> /proc/1/fd/1
+echo "Replace actionscript executed with the following environment." >> /var/log/stdout
+env >> /var/log/stdout
+cat >> /var/log/stdout
 EOF
 else
   # Future state, launch a daemon to watch for creation/change of Kubernetes
@@ -137,19 +137,19 @@ if [ "$(basename $1)" == "$DAEMON" ]; then
     trap stop SIGINT SIGTERM
     $@ &
     pid="$!"
+    echo "SSHD running as PID $pid"
     mkdir -p /var/run/$DAEMON && echo "${pid}" > /var/run/$DAEMON/$DAEMON.pid
     sleep 1m
     vmtLogin
-    vmtTargetExists
-    if [ $? -eq 0 ]; then
+    if vmtTargetExists || false; then
       echo "Creating orchestration target."
       vmtCreateTarget
     else
       echo "This orchestration pod has already been added as a target."
     fi
     vmtLogout
+    tail -qf /var/log/stdout &
     wait "${pid}"
-    exit $?
 else
     exec "$@"
 fi
