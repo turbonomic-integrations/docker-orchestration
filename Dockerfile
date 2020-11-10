@@ -7,7 +7,7 @@ COPY entrypoint.sh /entrypoint.sh
 RUN apk update && \
     apk --no-cache add bash git openssh augeas shadow jq curl && \
     groupadd -g 1000 turbo && \
-    useradd -r -m -p '' -u 1000 -g 1000 -c 'SSHD User' turbo && \
+    useradd -r -m -p '' -u 1000 -g 1000 -c 'SSHD User' -s /bin/bash turbo && \
     mkdir -p /etc/authorized_keys && \
     mkdir -p /etc/ssh/keys && \
     mkdir -p /opt/turbonomic/actionscripts && \
