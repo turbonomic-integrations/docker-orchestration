@@ -7,7 +7,7 @@ metadata:
     environment: prod
     team: turbointegrations
     app: actionscripts
-    version: "0.0.3.dev0"
+    version: "0.0.3"
 spec:
   replicas: 1
   selector:
@@ -19,11 +19,11 @@ spec:
         environment: prod
         team: turbointegrations
         app: actionscripts
-        version: "0.0.3.dev0"
+        version: "0.0.3"
     spec:
       containers:
       - name: actionscripts
-        image: turbointegrations/orchestration:latest
+        image: turbointegrations/orchestration:0.0.3
         imagePullPolicy: IfNotPresent
         env:
         - name: TURBOPASS
