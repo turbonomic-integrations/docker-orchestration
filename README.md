@@ -27,7 +27,9 @@ When deployed with the necessary [prerequisites](#prerequisites), this image wil
 The target will refer to an action script manifest found at `/actionscripts/manifest.json` within the image. The image ships with a simple manifest which defines a replace action script for VIRTUAL_MACHINE RIGHT_SIZE actions, which will take no action, but will dump the environment variables and SDK Probe JSON to the log output of the container.
 
 If the default script is used, you can access the log output (after executing a VIRTUAL_MACHINE RIGHT_SIZE action, via properly configured policy) with this command;
-`$ kubectl logs $(kubectl get pods -l app=actionscripts -n turbointegrations -o name) -n turbointegrations`
+```
+$ kubectl logs $(kubectl get pods -l app=actionscripts -n turbointegrations -o name) -n turbointegrations`
+```
 
 ## Custom Manifest and Script(s)
 By mounting a custom manifest file to `/actionscripts/manifest.json`, and custom python scripts which require only the [included modules](#contents) from the image to any path referenced by the manifest, this can be used stand-alone to execute custom action scripts.
@@ -35,11 +37,17 @@ By mounting a custom manifest file to `/actionscripts/manifest.json`, and custom
 # Prerequisites
 
 This requires the following prerequisites.
+* A Kubernetes namespace named `turbointegrations`
 * SSH Daemon Host Key (public and private)
   * This is used to uniquely identify the SSH "host", in this case, the single running pod in Kubernetes which hosts this integration.
 * SSH User Authorized Key (public and private)
   * This is used to uniquely identify the SSH "user" which is authorized to connect to the SSH Daemon.
 * Turbonomic API Service Account Username & Password
+
+If your Kubernetes cluster does not already have a `turbointegrations` namespace, you may create it with;
+```
+$ kubectl create namespace turbointegrations
+```
 
 To generate a host key and user key the following commands can be used
 (ProTip: Do *NOT* set a passphrase for the keys.);
