@@ -2,13 +2,13 @@
 set -e
 
 DAEMON=sshd
-TURBOADDR=${TURBOADDR:="api:8080"}
+TURBOADDR=${TURBOADDR:="api.turbonomic.svc.cluster.local:8080"}
 TURBOUSER=${TURBOUSER:="administrator"}
 TURBOPASS=${TURBOPASS:="administrator"}
-ADDR=${ADDR:="actionscripts"}
+ADDR=${ADDR:="actionscripts.turbointegrations.svc.cluster.local"}
 PORT=${PORT:=22}
 USER=${USER:="turbo"}
-MANPATH=${MANPATH:="/actionscripts/manifest.json"}
+MANPATH=${MANPATH:="/opt/turbonomic/actionscripts/manifest.json"}
 cookies=/tmp/.cookies
 
 stop() {
@@ -105,8 +105,8 @@ for f in $(find /etc/authorized_keys/ -type f -maxdepth 1); do
 done
 
 # Check if a manifest file exists, or not
-if [ ! -e "/actionscripts/manifest.json" ]; then
-  cat <<EOF > /actionscripts/manifest.json
+if [ ! -e "$MANPATH" ]; then
+  cat <<EOF > $MANPATH
 {
  "scripts": [
  	{
@@ -121,11 +121,13 @@ if [ ! -e "/actionscripts/manifest.json" ]; then
 }
 EOF
 
-  cat <<EOF > /actionscripts/replace_resize_vm.sh
+  cat <<EOF > /opt/turbonomic/actionscripts/replace_resize_vm.sh
 echo "Replace actionscript executed with the following environment." >> /var/log/stdout
 env >> /var/log/stdout
-cat >> /var/log/stdout
+cat | jq -r '.' >> /var/log/stdout
 EOF
+
+  chmod +x /opt/turbonomic/actionscripts/replace_resize_vm.sh
 else
   # Future state, launch a daemon to watch for creation/change of Kubernetes
   # custom resources which define action scripts.

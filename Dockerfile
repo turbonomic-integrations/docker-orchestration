@@ -10,8 +10,8 @@ RUN apk update && \
     useradd -r -m -p '' -u 1000 -g 1000 -c 'SSHD User' turbo && \
     mkdir -p /etc/authorized_keys && \
     mkdir -p /etc/ssh/keys && \
-    mkdir -p /actionscripts && \
-    chown -R turbo:turbo /actionscripts && \
+    mkdir -p /opt/turbonomic/actionscripts && \
+    chown -R turbo:turbo /opt/turbonomic/actionscripts && \
     augtool 'set /files/etc/ssh/sshd_config/AuthorizedKeysFile "/etc/authorized_keys/%u"' && \
     augtool 'set /files/etc/ssh/sshd_config/HostKey[1] /etc/ssh/keys/hostkey' && \
     echo -e "Port 22\n" >> /etc/ssh/sshd_config && \
