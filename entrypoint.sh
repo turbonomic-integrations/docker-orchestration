@@ -46,29 +46,18 @@ function vmtCreateTarget() {
 }
 
 function getRequest() {
-    local inputFields=$(mkarray \
-			    "$(mkobject name '"nameOrAddress"' value '"'"$ADDR"'"')" \
-			    "$(mkobject name '"port"' value $PORT)" \
-			    "$(mkobject name '"manifestPath"' value '"'"$MANPATH"'"')" \
-			    "$(mkobject name '"userid"' value '"'"$USER"'"')" \
-			    "$(mkobject name '"privateKeyString"' value '"'"$1"'"')" \
-			)
-    echo "$(mkobject category '"Orchestrator"' type '"Action Script"' inputFields "$inputFields")"
-}
+  dto='{ "category": "Orchestrator", "type": "Action Script", "inputFields": ($f | to_entries | map(with_entries(if .key == "key" then .key = "name" else . end)) ) }'
+  inputFields='{ "nameOrAddress": $a, "port": $p, "manifestPath":$m, "userid":$u, "privateKeyString":$k }'
 
-function mkobject() {
-    local obj=()
-    for i in $(seq 1 2 $(( $# - 1 ))) ; do
-	local iplus1=$((i + 1))
-	objs+=('"'"${!i}"'": '"${!iplus1}")
-    done
-    local IFS=","
-    echo "{${objs[*]}}"
-}
-
-function mkarray() {
-    local IFS=","
-    echo "[$*]"
+  jq -Rnc \
+    --argjson f "$(jq -Rn \
+      --arg a "$addr" \
+      --arg p "$port" \
+      --arg m "$manifest" \
+      --arg u "$user" \
+      --arg k "$1" \
+      "$inputFields")" \
+    "$dto"
 }
 
 function vmtTargetExists() {
